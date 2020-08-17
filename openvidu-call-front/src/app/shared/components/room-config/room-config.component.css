@@ -86,13 +86,11 @@
 }
 
 
-/* .volumeSlider {
-  position: absolute;
-  height: 60%;
-  z-index: 99999;
-  bottom: 0;
-  pointer-events: none;
-} */
+.volumeter {
+    position: absolute;
+    bottom: 75px;
+    z-index: 9999;
+}
 
 #header_img {
   max-width: 150px;

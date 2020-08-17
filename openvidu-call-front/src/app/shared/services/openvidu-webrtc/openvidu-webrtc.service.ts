@@ -6,11 +6,17 @@ import { LoggerService } from '../logger/logger.service';
 import { ILogger } from '../../types/logger-type';
 import { LocalUsersService } from '../local-users/local-users.service';
 import { ScreenType } from '../../types/video-type';
+import { Observable } from 'rxjs/internal/Observable';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class OpenViduWebrtcService implements IOpenViduWebRTC {
+
+	audioVolume: Observable<number>;
+	private _audioVolume = <BehaviorSubject<number>>new BehaviorSubject(0);
+
 	private OV: OpenVidu = null;
 	private OVScreen: OpenVidu = null;
 
@@ -23,6 +29,7 @@ export class OpenViduWebrtcService implements IOpenViduWebRTC {
 	private screenMediaStream: MediaStream = null;
 	private webcamMediaStream: MediaStream = null;
 
+
 	private log: ILogger;
 
 	constructor(private loggerSrv: LoggerService, private localUsersSrv: LocalUsersService) {
@@ -32,6 +39,11 @@ export class OpenViduWebrtcService implements IOpenViduWebRTC {
 	initialize() {
 		this.OV = new OpenVidu();
 		this.OVScreen = new OpenVidu();
+
+		this.audioVolume = this._audioVolume.asObservable();
+
+		this.OV.enableProdMode();
+		this.OVScreen.enableProdMode();
 	}
 
 	initSessions() {
@@ -106,9 +118,31 @@ export class OpenViduWebrtcService implements IOpenViduWebRTC {
 		this.audioSource = undefined;
 	}
 
-	initWebcamPublisher(targetElement: string | HTMLElement, properties: PublisherProperties): Publisher {
+	// initWebcamPublisher(targetElement: string | HTMLElement, properties: PublisherProperties): Publisher {
+	// 	const publisher = this.OV.initPublisher(targetElement, properties);
+	// 	this.localUsersSrv.setWebcamPublisher(publisher);
+	// 	publisher.once('streamPlaying', () => {
+	// 		(<HTMLElement>publisher.videos[0].video).parentElement.classList.remove('custom-class');
+	// 	});
+	// 	return publisher;
+	// }
+
+	initPublisher(targetElement: string | HTMLElement, properties: PublisherProperties): Publisher {
+		this.log.d('Initializing publisher with properties: ', properties);
+
 		const publisher = this.OV.initPublisher(targetElement, properties);
-		this.localUsersSrv.setWebcamPublisher(publisher);
+		// this.localUsersSrv.setWebcamPublisher(publisher);
+		publisher.once('streamPlaying', () => {
+			(<HTMLElement>publisher.videos[0].video).parentElement.classList.remove('custom-class');
+		});
+		return publisher;
+	}
+
+	async initPublisherAsync(targetElement: string | HTMLElement, properties: PublisherProperties): Promise<Publisher> {
+		this.log.d('Initializing publisher with properties: ', properties);
+
+		const publisher = await this.OV.initPublisherAsync(targetElement, properties);
+		// this.localUsersSrv.setWebcamPublisher(publisher);
 		publisher.once('streamPlaying', () => {
 			(<HTMLElement>publisher.videos[0].video).parentElement.classList.remove('custom-class');
 		});
@@ -125,14 +159,14 @@ export class OpenViduWebrtcService implements IOpenViduWebRTC {
 		}
 	}
 
-	initScreenPublisher(targetElement: string | HTMLElement, properties: PublisherProperties): Publisher {
-		this.log.d('Initializing screen publisher with properties: ', properties);
-		const publisher = this.OV.initPublisher(targetElement, properties);
-		publisher.once('streamPlaying', () => {
-			(<HTMLElement>publisher.videos[0].video).parentElement.classList.remove('custom-class');
-		});
-		return publisher;
-	}
+	// initScreenPublisher(targetElement: string | HTMLElement, properties: PublisherProperties): Publisher {
+	// 	this.log.d('Initializing screen publisher with properties: ', properties);
+	// 	const publisher = this.OV.initPublisher(targetElement, properties);
+	// 	publisher.once('streamPlaying', () => {
+	// 		(<HTMLElement>publisher.videos[0].video).parentElement.classList.remove('custom-class');
+	// 	});
+	// 	return publisher;
+	// }
 
 	destroyScreenPublisher(): void {
 		const publisher = this.localUsersSrv.getScreenPublisher();
@@ -215,7 +249,8 @@ export class OpenViduWebrtcService implements IOpenViduWebRTC {
 				mirror
 			);
 
-			const publisher = this.initWebcamPublisher(undefined, properties);
+			const publisher = this.initPublisher(undefined, properties);
+			this.localUsersSrv.setWebcamPublisher(publisher);
 
 			publisher.once('streamPlaying', () => {
 				this.localUsersSrv.setWebcamPublisher(publisher);
@@ -321,6 +356,18 @@ export class OpenViduWebrtcService implements IOpenViduWebRTC {
 
 	getSessionOfUserConnected(): Session {
 		return this.localUsersSrv.isWebCamEnabled() ? this.webcamSession : this.screenSession;
+	}
+
+	startAudioVolumeEvent() {
+		this.localUsersSrv.getWebcamPublisher()?.once('streamAudioVolumeChange', (event: any) => {
+			console.log("VALUE ", Math.trunc(Math.abs(event.value.newValue)));
+			this._audioVolume.next(Math.abs(event.value.newValue));
+		});
+	}
+
+	stopAudioVolumeEvent() {
+		this.localUsersSrv.getWebcamPublisher().off('streamAudioVolumeChange');
+		this._audioVolume.next(0);
 	}
 
 	private stopScreenTracks() {

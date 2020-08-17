@@ -38,6 +38,8 @@
 					>
 					</mat-slider> -->
 
+					<app-volume-bar class="volumeter" [color]="primary" [value]="audioVolume" [mode]="determinate"></app-volume-bar>
+
 					<div *ngFor="let localUser of localUsers; let i = index">
 						<!-- Only webcam video will be shown if webcamera is available -->
 						<ov-video

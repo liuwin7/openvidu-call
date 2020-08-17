@@ -25,6 +25,8 @@ import { ElementZoneStrategyFactory } from 'elements-zone-strategy';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AppRoutingModule } from './app-routing.module';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 
 
 // Pipes
@@ -67,6 +69,7 @@ import { NotificationService } from './shared/services/notifications/notificatio
 import { StorageService } from './shared/services/storage/storage.service';
 import { CdkOverlayContainer } from './shared/config/custom-cdk-overlay-container';
 import { LocalUsersService } from './shared/services/local-users/local-users.service';
+import { VolumeBarComponent } from './shared/components/volume-bar/volume-bar.component';
 
 @NgModule({
 	declarations: [
@@ -92,6 +95,7 @@ import { LocalUsersService } from './shared/services/local-users/local-users.ser
 		HasExitPipe,
 		TooltipListPipe,
 		FooterComponent,
+		VolumeBarComponent,
 	],
 	imports: [
 		FormsModule,
@@ -117,7 +121,8 @@ import { LocalUsersService } from './shared/services/local-users/local-users.ser
 		AppRoutingModule,
 		HttpClientModule,
 		FlexLayoutModule,
-		MatMenuModule
+		MatMenuModule,
+		MatProgressBarModule
 	],
 	entryComponents: [DialogErrorComponent, WebComponentComponent],
 	providers: [
