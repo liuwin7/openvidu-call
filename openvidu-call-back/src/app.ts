@@ -1,17 +1,95 @@
-
 import * as express from 'express';
 import { SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET, CALL_OPENVIDU_CERTTYPE } from './config';
 import {app as callController} from './controllers/CallController';
 import * as dotenv from 'dotenv';
+const expressWs = require('express-ws');
 
 dotenv.config();
 const app = express();
+app.all('*', (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+    res.header('Access-Control-Allow-Headers', "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Credentials","true");
+    next();
+});
+const {app: wsApp} = expressWs(app);
 
+wsApp.use(express.static('public'));
+wsApp.use(express.json());
 
-app.use(express.static('public'));
-app.use(express.json());
+wsApp.use('/call', callController);
+const wsDB = {};
 
-app.use('/call', callController);
+const findWSById = userId => {
+    const wsItem = wsDB[userId];
+    if (!wsItem) {
+        return null;
+    }
+    return wsItem.ws;
+};
+
+wsApp.ws('/my-call', (ws, req) => {
+    ws.on('message', msg => {
+        console.log('msg', msg);
+        const data = JSON.parse(msg);
+        if (data.type === 'invite') { // 呼出
+            const {action, originUserId, peerUserId} = data;
+            // 响铃，拒接
+            if (action === 'ring' || action === 'reject') {
+                const peerWS = findWSById(peerUserId);
+                if (!peerWS) {
+                    return ws.send(JSON.stringify({error: 'not online'}));
+                }
+                peerWS.send(msg); // 转发消息给对方
+            } else if (action === 'answer') { // 应答
+                const peerWS = findWSById(originUserId);
+                if (!peerWS) {
+                    return ws.send(JSON.stringify({error: 'not online'}));
+                }
+                const connectData = {
+                    type: 'connect',
+                    session: 'session_' + originUserId + '_' + peerUserId,
+                };
+                peerWS.send(JSON.stringify(connectData));
+                ws.send(JSON.stringify(connectData));
+            } else {
+                console.warn('【Default msg】', msg);
+            }
+        } else if (data.type === 'disconnect') {
+            const {action, originUserId, peerUserId} = data;
+            if (action === 'handoff') {
+                const originWS = findWSById(originUserId);
+                const peerWS = findWSById(peerUserId);
+                const disconnectData = JSON.stringify({
+                    type: 'disconnect',
+                });
+                if (originWS) {
+                    originWS.send(disconnectData);
+                }
+                if (peerWS) {
+                    peerWS.send(disconnectData);
+                }
+            }
+        } else if (data.type === 'registration') { // 注册
+            const {userId, userName} = data;
+            const lastWSItem = wsDB[userId];
+            if (lastWSItem) {
+                const {ws: lastWS} = lastWSItem;
+                if (lastWS !== ws) {
+                    lastWS.close();
+                }
+            }
+            wsDB[userId] = {ws, userId, userName};
+        }
+    });
+});
+wsApp.get('/dashboard/onlineUsers', (req, res) => {
+    res.send({
+        users: Object.values(wsDB)
+            .map(({userId, userName}) => ({userId, userName})),
+    });
+});
 
 app.listen(SERVER_PORT, () => {
     console.log("---------------------------------------------------------");
