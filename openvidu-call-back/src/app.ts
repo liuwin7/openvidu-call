@@ -36,12 +36,22 @@ wsApp.ws('/my-call', (ws, req) => {
         if (data.type === 'invite') { // 呼出
             const {action, originUserId, peerUserId} = data;
             // 响铃，拒接
-            if (action === 'ring' || action === 'reject') {
+            if (action === 'ring'
+                || action === 'cancel') {
                 const peerWS = findWSById(peerUserId);
                 if (!peerWS) {
                     return ws.send(JSON.stringify({error: 'not online'}));
                 }
                 peerWS.send(msg); // 转发消息给对方
+            } else if (action === 'reject') {
+                const originWS = findWSById(originUserId);
+                const peerWS = findWSById(peerUserId);
+                for (const w of [originWS, peerWS]) {
+                    if (w !== ws) {
+                        // 转发给对方
+                        w.send(msg);
+                    }
+                }
             } else if (action === 'answer') { // 应答
                 const peerWS = findWSById(originUserId);
                 if (!peerWS) {
