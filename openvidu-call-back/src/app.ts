@@ -103,7 +103,7 @@ wsApp.get('/dashboard/onlineUsers', (req, res) => {
     });
 });
 
-https.createServer({
+const httpsServer = https.createServer({
     key: fs.readFileSync(__dirname + '/certs/private.key'),
     cert: fs.readFileSync(__dirname + '/certs/full_chain.pem'),
 }, () => {
@@ -115,4 +115,8 @@ https.createServer({
     console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
     console.log(" ")
     console.log("---------------------------------------------------------");
-}).listen(SERVER_PORT);
+});
+httpsServer.on('connection', (socket) => {
+    console.log('connection', socket);
+});
+httpsServer.listen(SERVER_PORT);
