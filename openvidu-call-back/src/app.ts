@@ -3,6 +3,7 @@ import { SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET, CALL_OPENVIDU_CERTTYPE } fr
 import {app as callController} from './controllers/CallController';
 import * as dotenv from 'dotenv';
 import * as https from 'https';
+import * as http from 'http';
 import * as fs from "fs";
 const expressWs = require('express-ws');
 
@@ -106,7 +107,8 @@ wsApp.get('/dashboard/onlineUsers', (req, res) => {
 const httpsServer = https.createServer({
     key: fs.readFileSync(__dirname + '/certs/private.key'),
     cert: fs.readFileSync(__dirname + '/certs/full_chain.pem'),
-}, () => {
+}, wsApp);
+httpsServer.on('listening', () => {
     console.log("---------------------------------------------------------");
     console.log(" ")
     console.log(`OPENVIDU URL: ${OPENVIDU_URL}`);
@@ -115,8 +117,5 @@ const httpsServer = https.createServer({
     console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
     console.log(" ")
     console.log("---------------------------------------------------------");
-});
-httpsServer.on('connection', (socket) => {
-    console.log('connection', socket);
 });
 httpsServer.listen(SERVER_PORT);
