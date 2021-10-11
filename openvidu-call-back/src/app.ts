@@ -3,8 +3,8 @@ import { SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET, CALL_OPENVIDU_CERTTYPE } fr
 import {app as callController} from './controllers/CallController';
 import * as dotenv from 'dotenv';
 import * as https from 'https';
-import * as http from 'http';
 import * as fs from "fs";
+import _ from 'lodash';
 const expressWs = require('express-ws');
 
 dotenv.config();
@@ -54,6 +54,12 @@ const findWSById = userId => {
 };
 
 wsApp.ws('/my-call', (ws, req) => {
+    ws.on('close', ev => {
+        const clientUserId = _.findKey(wsDB, {'ws': ws});
+        if (clientUserId) {
+            _.unset(wsDB, clientUserId);
+        }
+    });
     ws.on('message', msg => {
         console.log('msg', msg);
         const data = JSON.parse(msg);
