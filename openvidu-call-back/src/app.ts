@@ -58,6 +58,7 @@ wsApp.ws('/my-call', (ws, req) => {
         const clientUserId = _.findKey(wsDB, {'ws': ws});
         if (clientUserId) {
             _.unset(wsDB, clientUserId);
+            console.log(clientUserId + ' offline.');
         }
     });
     ws.on('message', msg => {
