@@ -4,8 +4,8 @@ import {app as callController} from './controllers/CallController';
 import * as dotenv from 'dotenv';
 import * as https from 'https';
 import * as fs from "fs";
-import _ from 'lodash';
 const expressWs = require('express-ws');
+const _ = require('lodash');
 
 dotenv.config();
 const app = express();
