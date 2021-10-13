@@ -51,7 +51,7 @@
     },
     "scripts": {
         "build": "webpack",
-        "start": "cross-env CALL_OPENVIDU_CERTTYPE=owncert nodemon src/app.ts",
+        "start": "cross-env nodemon src/app.ts",
         "test": "jest"
     },
     "version": "2.18.0"
