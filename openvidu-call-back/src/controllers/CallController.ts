@@ -42,5 +42,9 @@ function handleError(error: any, res: Response) {
         res.status(401).send('ERROR: Self signed certificate Visit ' + OPENVIDU_URL);
         return;
     }
-    res.status(statusCode).send('ERROR: Cannot create OpenVidu session');
+    if (statusCode) {
+        res.status(statusCode).send('ERROR: Cannot create OpenVidu session');
+    } else {
+        res.status(500).send('Server Error');
+    }
 }
