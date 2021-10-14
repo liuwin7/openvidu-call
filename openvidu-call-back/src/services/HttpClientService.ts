@@ -13,7 +13,7 @@ export class HttpClientService {
 
 		if(CALL_OPENVIDU_CERTTYPE === 'selfsigned'){
 			this.options.httpsAgent = new https.Agent({
-				rejectUnauthorized: false
+				rejectUnauthorized: false,
 			});
 		}
 
@@ -23,19 +23,6 @@ export class HttpClientService {
 		};
 
 		try {
-			const res = await axios({
-				method: 'post',
-				url: openviduUrl,
-				data: body,
-				headers: {
-					Authorization: 'Basic ' + btoa('OPENVIDUAPP:' + openviduSecret),
-					'Content-Type': 'application/json',
-				},
-				httpsAgent: new https.Agent({
-					rejectUnauthorized: false
-				})
-			});
-			return res.data;
 			const response = await axios.post<any>(openviduUrl, body, this.options);
 			return response.data;
 		} catch (error) {
