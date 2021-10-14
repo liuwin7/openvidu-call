@@ -38,7 +38,7 @@ function handleError(error: any, res: Response) {
         res.status(503).send('ECONNREFUSED: Cannot connect with OpenVidu Server');
         return;
     }
-    if (error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT' || error.code.includes('SELF_SIGNED_CERT')) {
+    if (error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT' || error.code?.includes('SELF_SIGNED_CERT')) {
         res.status(401).send('ERROR: Self signed certificate Visit ' + OPENVIDU_URL);
         return;
     }
