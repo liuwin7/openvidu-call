@@ -17,7 +17,7 @@ app.post('/', async (req: Request, res: Response) => {
         sessionId = sessionResponse.id;
     } catch (error) {
         const statusCode = error.response?.status;
-        if (statusCode && statusCode !== 409) {
+        if (statusCode !== 409) {
             handleError(error, res);
             return;
         }
