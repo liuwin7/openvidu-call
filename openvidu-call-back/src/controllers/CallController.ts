@@ -24,7 +24,7 @@ app.post('/', async (req: Request, res: Response) => {
     }
     try {
         const response = await openviduService.createToken(sessionId, OPENVIDU_URL, OPENVIDU_SECRET);
-        res.status(200).send(JSON.stringify(response.token));
+        res.status(200).send(response.token);
     } catch (error) {
         handleError(error, res);
     }
