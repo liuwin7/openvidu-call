@@ -68,7 +68,8 @@ wsApp.ws('/my-call', (ws, req) => {
             const {action, originUserId, peerUserId} = data;
             // 响铃，拒接
             if (action === 'ring'
-                || action === 'cancel') {
+                || action === 'cancel'
+                || action === 'busy') {
                 const peerWS = findWSById(peerUserId);
                 if (!peerWS) {
                     return ws.send(JSON.stringify({error: 'not online'}));
@@ -94,15 +95,6 @@ wsApp.ws('/my-call', (ws, req) => {
                 };
                 peerWS.send(JSON.stringify(connectData));
                 ws.send(JSON.stringify(connectData));
-            } else if (action === 'busy') { // 转发busy
-                const peerWS = findWSById(originUserId);
-                if (!peerWS) {
-                    return ws.send(JSON.stringify({error: 'not online'}));
-                }
-                peerWS.send(JSON.stringify({
-                    type: 'invite',
-                    action: 'busy',
-                }));
             } else {
                 console.warn('【Default msg】', msg);
             }
