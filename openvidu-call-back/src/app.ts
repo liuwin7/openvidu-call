@@ -54,6 +54,13 @@ const findWSById = userId => {
 };
 
 wsApp.ws('/my-call', (ws, req) => {
+    ws.on('error', ev => {
+        const clientUserId = _.findKey(wsDB, {'ws': ws});
+        if (clientUserId) {
+            _.unset(wsDB, clientUserId);
+            console.log(clientUserId + ' offline.');
+        }
+    });
     ws.on('close', ev => {
         const clientUserId = _.findKey(wsDB, {'ws': ws});
         if (clientUserId) {
