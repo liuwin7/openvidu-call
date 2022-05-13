@@ -62,7 +62,7 @@ wsApp.ws('/my-call', (ws) => {
         }
     });
     ws.on('close', (ev: CloseEvent) => {
-        if (ev.code === 1111) {
+        if (ev.code === 4001) {
             // userId冲突，主动关闭，不做处理
             return;
         }
@@ -130,7 +130,7 @@ wsApp.ws('/my-call', (ws) => {
             if (lastWSItem) {
                 const {ws: lastWS} = lastWSItem;
                 if (lastWS !== ws) {
-                    lastWS.close(1111, `The userId[${userId}] was substituted!`);
+                    lastWS.close(4001, `The userId[${userId}] was substituted!`);
                 }
             }
             wsDB[userId] = {ws, userId, userName};
