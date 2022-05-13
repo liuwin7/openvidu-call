@@ -45,7 +45,7 @@ wsApp.use('/call', callController);
 const wsDB = {};
 
 // util function
-const findWSById = userId => {
+const findWSById = (userId: string) => {
     const wsItem = wsDB[userId];
     if (!wsItem) {
         return null;
@@ -53,7 +53,7 @@ const findWSById = userId => {
     return wsItem.ws;
 };
 
-wsApp.ws('/my-call', (ws, req) => {
+wsApp.ws('/my-call', (ws) => {
     ws.on('error', ev => {
         const clientUserId = _.findKey(wsDB, {'ws': ws});
         if (clientUserId) {
@@ -61,7 +61,11 @@ wsApp.ws('/my-call', (ws, req) => {
             console.log(clientUserId + ' offline.');
         }
     });
-    ws.on('close', ev => {
+    ws.on('close', (ev: CloseEvent) => {
+        if (ev.code === 1111) {
+            // userId冲突，主动关闭，不做处理
+            return;
+        }
         const clientUserId = _.findKey(wsDB, {'ws': ws});
         if (clientUserId) {
             _.unset(wsDB, clientUserId);
