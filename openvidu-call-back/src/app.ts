@@ -127,7 +127,7 @@ wsApp.ws('/my-call', (ws, req) => {
             if (lastWSItem) {
                 const {ws: lastWS} = lastWSItem;
                 if (lastWS !== ws) {
-                    lastWS.close();
+                    lastWS.close(1111, `The userId[${userId}] was substituted!`);
                 }
             }
             wsDB[userId] = {ws, userId, userName};
