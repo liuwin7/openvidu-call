@@ -130,7 +130,7 @@ wsApp.ws('/my-call', (ws) => {
             if (lastWSItem) {
                 const {ws: lastWS} = lastWSItem;
                 if (lastWS !== ws) {
-                    lastWS.close(4001, `The userId[${userId}] was substituted!`);
+                    lastWS.close(4001, `用户ID[${userId}]被顶替下线!`);
                 }
             }
             wsDB[userId] = {ws, userId, userName};
