@@ -45,7 +45,7 @@ wsApp.use('/call', callController);
 const wsDB = {};
 
 // util function
-const findWSById = userId => {
+const findWSById = (userId: string) => {
     const wsItem = wsDB[userId];
     if (!wsItem) {
         return null;
@@ -53,8 +53,19 @@ const findWSById = userId => {
     return wsItem.ws;
 };
 
-wsApp.ws('/my-call', (ws, req) => {
-    ws.on('close', ev => {
+wsApp.ws('/my-call', (ws) => {
+    ws.on('error', ev => {
+        const clientUserId = _.findKey(wsDB, {'ws': ws});
+        if (clientUserId) {
+            _.unset(wsDB, clientUserId);
+            console.log(clientUserId + ' offline.');
+        }
+    });
+    ws.on('close', (ev: CloseEvent) => {
+        if (ev.code === 4001) {
+            // userId冲突，主动关闭，不做处理
+            return;
+        }
         const clientUserId = _.findKey(wsDB, {'ws': ws});
         if (clientUserId) {
             _.unset(wsDB, clientUserId);
@@ -119,7 +130,7 @@ wsApp.ws('/my-call', (ws, req) => {
             if (lastWSItem) {
                 const {ws: lastWS} = lastWSItem;
                 if (lastWS !== ws) {
-                    lastWS.close();
+                    lastWS.close(4001, `用户ID[${userId}]被顶替下线!`);
                 }
             }
             wsDB[userId] = {ws, userId, userName};
