@@ -2,18 +2,14 @@ import * as express from 'express';
 import { SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET, CALL_OPENVIDU_CERTTYPE } from './config';
 import {app as callController} from './controllers/CallController';
 import * as dotenv from 'dotenv';
-import * as https from 'https';
-import * as fs from "fs";
+import * as http from 'http';
 const expressWs = require('express-ws');
 const _ = require('lodash');
 
 dotenv.config();
 const app = express();
 
-const httpsServer = https.createServer({
-    key: fs.readFileSync(__dirname + '/certs/private.key'),
-    cert: fs.readFileSync(__dirname + '/certs/full_chain.pem'),
-}, app)
+const httpServer = http.createServer(app)
     .on('listening', () => {
         console.log("---------------------------------------------------------");
         console.log(" ")
@@ -26,7 +22,7 @@ const httpsServer = https.createServer({
     })
     .listen(SERVER_PORT);
 
-const {app: wsApp} = expressWs(app, httpsServer);
+const {app: wsApp} = expressWs(app, httpServer);
 
 // modify the res header to allow origin
 app.all('*', (req, res, next) => {
