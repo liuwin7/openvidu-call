@@ -102,7 +102,7 @@ wsApp.ws('/my-call', (ws) => {
                 }
                 const connectData = {
                     type: 'connect',
-                    session: 'session_' + originUserId + '_' + peerUserId,
+                    session: 'session_' + originUserId + '_' + peerUserId + '_' + (new Date()).getTime(),
                 };
                 peerWS.send(JSON.stringify(connectData));
                 ws.send(JSON.stringify(connectData));
