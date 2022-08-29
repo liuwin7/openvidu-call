@@ -1,10 +1,14 @@
-FROM node:lts-alpine
-ENV NODE_ENV=production
-RUN npm config set registry https://registry.npm.taobao.org
-RUN npm install pm2 -g && pm2 install pm2-logrotate && pm2 set pm2-logrotate:retain 30
+FROM nikolaik/python-nodejs:python3.8-nodejs18-alpine
+
 WORKDIR /usr/src/app
-COPY ["./dist", "./"]
-EXPOSE 40002 
-RUN chown -R node /usr/src/app
-USER node
-CMD ["pm2", "start", "openvidu-call-server.js", "--watch", "--no-daemon"]
+
+COPY ["./", "./"]
+
+RUN npm config set registry https://registry.npm.taobao.org
+# RUN chown -R node /usr/src/app
+RUN npm install
+RUN npm run build
+
+EXPOSE 40002
+
+CMD [ "node", "dist/openvidu-call-server.js" ]

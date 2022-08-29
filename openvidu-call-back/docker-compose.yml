@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  openvidu-call-back:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "40002:40002"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - SERVER_PORT=40002
+      - OPENVIDU_URL="https://10.235.66.18:40001"
+      - CALL_OPENVIDU_CERTTYPE=owncert
+      - OPENVIDU_SECRET=openvidu
