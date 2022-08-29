@@ -5,7 +5,6 @@ import * as dotenv from 'dotenv';
 import * as http from 'http';
 import * as _ from 'lodash';
 import * as ExpressWs from 'express-ws';
-import { WebSocket } from 'ws';
 
 dotenv.config();
 const app = express();
@@ -25,6 +24,10 @@ const httpServer = http.createServer(app)
 
 const { app: wsApp } = ExpressWs(app, httpServer);
 
+// 需要再express-ws初始化以后再导入，否则会报错，参考
+// https://github.com/HenningM/express-ws#:~:text=before%20loading%20or%20defining%20your%20routers
+import wsController from './controllers/WSController';
+
 // modify the res header to allow origin
 app.all('*', (req, res, next) => {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
@@ -41,119 +44,4 @@ app.all('*', (req, res, next) => {
 wsApp.use(express.static('public'));
 wsApp.use(express.json());
 wsApp.use('/call', callController);
-
-// call database in memory
-const wsDB: {
-    [key: string]: {
-        ws: WebSocket;
-        userId: string;
-        userName: string;
-    }
-} = {};
-
-// util function
-const findWSById = (userId: string) => {
-    const wsItem = wsDB[userId];
-    if (!wsItem) {
-        return null;
-    }
-    return wsItem.ws;
-};
-
-wsApp.ws('/my-call', (ws: WebSocket) => {
-    ws.on('error', () => {
-        const clientUserId = _.findKey(wsDB, { 'ws': ws });
-        if (clientUserId) {
-            _.unset(wsDB, clientUserId);
-            console.log(clientUserId + ' offline.');
-        }
-    });
-    ws.on('close', (ev: CloseEvent) => {
-        if (ev.code === 4001) {
-            // userId冲突，主动关闭，不做处理
-            return;
-        }
-        const clientUserId = _.findKey(wsDB, { 'ws': ws });
-        if (clientUserId) {
-            _.unset(wsDB, clientUserId);
-            console.log(clientUserId + ' offline.');
-        }
-    });
-    ws.onmessage = (event) => {
-        const msg = event.data.toString();
-        var data: any;
-        try {
-            data = JSON.parse(msg);
-        } catch (error) {
-            console.error("[WS Error] 错误的JSON数据格式");
-            return;
-        }
-        if (data.type === 'invite') { // 呼出
-            const { action, originUserId, peerUserId } = data;
-            // 响铃，拒接
-            if (action === 'ring'
-                || action === 'cancel'
-                || action === 'busy') {
-                const peerWS = findWSById(peerUserId);
-                if (!peerWS) {
-                    return ws.send(JSON.stringify({ error: 'not online' }));
-                }
-                peerWS.send(msg); // 转发消息给对方
-            } else if (action === 'reject') {
-                const originWS = findWSById(originUserId);
-                const peerWS = findWSById(peerUserId);
-                for (const w of [originWS, peerWS]) {
-                    if (w !== ws) {
-                        // 转发给对方
-                        w.send(msg);
-                    }
-                }
-            } else if (action === 'answer') { // 应答
-                const peerWS = findWSById(originUserId);
-                if (!peerWS) {
-                    return ws.send(JSON.stringify({ error: 'not online' }));
-                }
-                const connectData = {
-                    type: 'connect',
-                    session: 'session_' + originUserId + '_' + peerUserId + '_' + (new Date()).getTime(),
-                };
-                peerWS.send(JSON.stringify(connectData));
-                ws.send(JSON.stringify(connectData));
-            } else {
-                console.warn('【Default msg】', msg);
-            }
-        } else if (data.type === 'disconnect') {
-            const { action, originUserId, peerUserId } = data;
-            if (action === 'handoff') {
-                const originWS = findWSById(originUserId);
-                const peerWS = findWSById(peerUserId);
-                const disconnectData = JSON.stringify({
-                    type: 'disconnect',
-                });
-                if (originWS) {
-                    originWS.send(disconnectData);
-                }
-                if (peerWS) {
-                    peerWS.send(disconnectData);
-                }
-            }
-        } else if (data.type === 'registration') { // 注册
-            const { userId, userName } = data;
-            const lastWSItem = wsDB[userId];
-            if (lastWSItem) {
-                const { ws: lastWS } = lastWSItem;
-                if (lastWS !== ws) {
-                    lastWS.close(4001, `用户ID[${userId}]被顶替下线!`);
-                }
-            }
-            wsDB[userId] = { ws, userId, userName };
-        }
-    };
-});
-
-wsApp.get('/dashboard/onlineUsers', (req, res) => {
-    res.send({
-        users: Object.values(wsDB)
-            .map(({ userId, userName }) => ({ userId, userName })),
-    });
-});
+wsApp.use('/my-call', wsController);
