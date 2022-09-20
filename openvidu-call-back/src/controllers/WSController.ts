@@ -111,6 +111,7 @@ router.ws('/', (ws, req, next) => {
             console.log(clientUserId + ' offline.');
         }
     };
+    next();
 });
 
 router.get("/onlineUsers", (req, res) => {
