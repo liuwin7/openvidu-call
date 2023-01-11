@@ -29,8 +29,7 @@ const listeningHandler = () => {
     console.log(`OPENVIDU URL: ${OPENVIDU_URL}`);
     console.log(`OPENVIDU SECRET: ${OPENVIDU_SECRET}`);
     console.log(`CALL OPENVIDU CERTTYPE: ${CALL_OPENVIDU_CERTTYPE}`);
-    console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
-    console.log(`Openvidu Call Server uses ${USE_SSL ? "HTTPS" : "HTTP"}`);
+    console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT} using ${USE_SSL ? "HTTPS" : "HTTP"}`);
     console.log(" ")
     console.log("---------------------------------------------------------");
 };
@@ -41,7 +40,7 @@ const server = USE_SSL
         cert: fs.readFileSync(__dirname + '/certs/full_chain.pem'),
     }, app)
     : http.createServer(app);
-    
+
 // start server listening
 server.on("listening", listeningHandler).listen(SERVER_PORT);
 
