@@ -10,21 +10,22 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 nvm install v16
 ```
 
-2. 使用npm安装[pm2](https://pm2.keymetrics.io/)
+2. 使用npm安装[pm2](https://pm2.keymetrics.io/)    
 `npm install pm2 -g`
 
-3. 安装项目依赖
+3. 安装项目依赖    
 ```bash
 cd <openvidu-call/openvidu-call-backend>
 npm install
 ```
 
-4. 使用pm2启动项目
+4. 使用pm2启动项目    
 `pm2 start npm --name openvidu-call-back -- run start`
 
 __修改配置信息__
 
-1. 配置文件位置 `<项目目录>/openvidu-call-back/src/config.ts`
+1. 配置文件位置    
+`<项目目录>/openvidu-call-back/src/config.ts`
 2. 配置信息
 ```javascript
 // 配置项目使用的端口号
@@ -46,5 +47,5 @@ export const OPENVIDU_SECRET = process.env.OPENVIDU_SECRET || 'openvidu';
 
 ```
 
-3. 修改完配置文件以后，需要手动重启一下服务。
+3. 修改完配置文件以后，需要手动重启一下服务。   
 `pm2 restart openvidu-call-back`
