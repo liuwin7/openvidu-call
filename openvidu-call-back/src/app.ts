@@ -1,12 +1,24 @@
 import * as express from 'express';
 import { SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET, CALL_OPENVIDU_CERTTYPE } from './config';
 import { app as callController } from './controllers/CallController';
+import { app as dashboardController } from './controllers/DashboardController';
 import * as dotenv from 'dotenv';
 import * as http from 'http';
 import * as _ from 'lodash';
 import * as ExpressWs from 'express-ws';
+import { WebSocket } from 'ws';
 
 dotenv.config();
+
+// call database in memory
+export const wsDB: {
+    [key: string]: {
+        ws: WebSocket;
+        userId: string;
+        userName: string;
+    }
+} = {};
+
 const app = express();
 
 const httpServer = http.createServer(app)
@@ -45,3 +57,4 @@ wsApp.use(express.static('public'));
 wsApp.use(express.json());
 wsApp.use('/call', callController);
 wsApp.use('/my-call', wsController);
+wsApp.use('/dashboard', dashboardController);

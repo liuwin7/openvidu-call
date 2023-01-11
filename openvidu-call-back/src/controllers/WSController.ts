@@ -1,15 +1,6 @@
 import * as express from 'express';
 import * as _ from 'lodash';
-import { WebSocket } from 'ws';
-
-// call database in memory
-const wsDB: {
-    [key: string]: {
-        ws: WebSocket;
-        userId: string;
-        userName: string;
-    }
-} = {};
+import { wsDB } from '../app';
 
 // util function
 const findWSById = (userId: string) => {
@@ -112,13 +103,6 @@ router.ws('/', (ws, req, next) => {
         }
     };
     next();
-});
-
-router.get("/onlineUsers", (req, res) => {
-    res.send({
-        users: Object.values(wsDB)
-            .map(({ userId, userName }) => ({ userId, userName })),
-    });
 });
 
 export default router;
