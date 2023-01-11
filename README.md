@@ -1,8 +1,8 @@
-__部署openvidu-call-back__
+# __部署openvidu-call-back__
 
 _说明：项目使用pm2管理相关进程_
 
-__部署过程__
+## __部署过程__
 
 1. 安装node.js环境，推荐使用nvm安装v16.19.0 [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
 ```bash
@@ -26,7 +26,7 @@ npm install
 pm2 start npm --name openvidu-call-back -- run start
 ```
 
-__修改配置信息__
+## __修改配置信息__
 
 1. 配置文件位置`<项目目录>/openvidu-call-back/src/config.ts`
 2. 配置信息
@@ -49,6 +49,7 @@ export const CALL_OPENVIDU_CERTTYPE = process.env.CALL_OPENVIDU_CERTTYPE || 'own
 export const OPENVIDU_SECRET = process.env.OPENVIDU_SECRET || 'openvidu';
 
 ```
+
 3. 修改完配置文件以后，需要手动重启一下服务。 
 ```
 pm2 restart openvidu-call-back
