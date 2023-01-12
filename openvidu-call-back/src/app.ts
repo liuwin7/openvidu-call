@@ -16,6 +16,7 @@ import * as fs from "fs";
 import * as _ from 'lodash';
 import * as ExpressWs from 'express-ws';
 import { WebSocket } from 'ws';
+import * as morgan from "morgan";
 
 // call database in memory
 export const wsDB: {
@@ -71,6 +72,7 @@ app.all('*', (req, res, next) => {
 
 wsApp.use(express.static('public'));
 wsApp.use(express.json());
+wsApp.use(morgan("common"));
 wsApp.use('/call', callController);
 wsApp.use('/my-call', wsController);
 wsApp.use('/dashboard', dashboardController);
