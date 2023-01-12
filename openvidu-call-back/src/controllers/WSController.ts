@@ -16,11 +16,13 @@ const router = express.Router();
 router.ws('/', (ws, req, next) => {
     ws.onmessage = event => {
         const msg = event.data.toString();
+        console.log("<Client Message> " + msg);
+        
         var data: any;
         try {
             data = JSON.parse(msg);
         } catch (error) {
-            console.error("[WS Error] 错误的JSON数据格式");
+            console.error("<WS Error> 错误的JSON数据格式 " + msg);
             return;
         }
         if (data.type === 'invite') { // 呼出
