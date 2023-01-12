@@ -1,16 +1,20 @@
+import * as dotenv from 'dotenv';
+// load env from .env file
+// see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config();
+import {
+    SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET,
+    CALL_OPENVIDU_CERTTYPE, USE_SSL
+} from './config';
 import * as express from 'express';
-import { SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET, CALL_OPENVIDU_CERTTYPE, USE_SSL } from './config';
 import { app as callController } from './controllers/CallController';
 import { app as dashboardController } from './controllers/DashboardController';
-import * as dotenv from 'dotenv';
 import * as http from 'http';
 import * as https from 'https';
 import * as fs from "fs";
 import * as _ from 'lodash';
 import * as ExpressWs from 'express-ws';
 import { WebSocket } from 'ws';
-
-dotenv.config();
 
 // call database in memory
 export const wsDB: {

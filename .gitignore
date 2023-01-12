@@ -43,6 +43,7 @@
 **/typings
 **/*.key
 **/*.crt
+.env
 
 # System Files
 **.DS_Store
