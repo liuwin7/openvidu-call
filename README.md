@@ -28,25 +28,28 @@ pm2 start npm --name openvidu-call-back -- run start
 
 ## __修改配置信息__
 
-1. 配置文件位置`<项目目录>/openvidu-call-back/src/config.ts`
+1. 配置文件位置`<项目目录>/openvidu-call-back/.env`
 2. 配置信息
-```javascript
-// 配置项目使用的端口号
-export const SERVER_PORT = process.env.SERVER_PORT || 40002;
-/**
- * 配置项目是否启用默认的HTTPS，默认配置是true。
- * 如果配置为true，将会使用<项目目录/openvidu-call-back/src/cert/full_chain.pem>和
- * <项目目录/openvidu-call-back/src/cert/private.key>。
- * 其中，private.key，没有在版本库中，需要手动上传到该位置。
- * 如果配置为false，将使用HTTP。
-*/ 
-export const USE_SSL = process.env.USE_SSL || true;
-// Openvidu服务器的URL
-export const OPENVIDU_URL = process.env.OPENVIDU_URL || 'http://61.51.178.38:40043'
-// Openvidu服务器的证书类型
-export const CALL_OPENVIDU_CERTTYPE = process.env.CALL_OPENVIDU_CERTTYPE || 'owncert';
-// Openvidu服务器的密码
-export const OPENVIDU_SECRET = process.env.OPENVIDU_SECRET || 'openvidu';
+```
+
+# 配置项目使用的端口号
+SERVER_PORT=40002
+
+# Openvidu Call服务器类型，默认配置是`https`。
+# 如果配置为https，将会使用<项目目录/openvidu-call-back/src/cert/full_chain.pem>和
+# <项目目录/openvidu-call-back/src/cert/private.key>。
+# 其中，private.key，没有在版本库中，需要手动上传到该位置。
+# 如果配置为http，将使用HTTP。
+SERVER_TYPE=https
+
+# Openvidu服务器的URL
+OPENVIDU_URL=http://120.48.83.53:5443
+
+# Openvidu服务器的证书类型
+CALL_OPENVIDU_CERTTYPE=owncert
+
+# Openvidu服务器的密码
+OPENVIDU_SECRET=openvidu
 
 ```
 

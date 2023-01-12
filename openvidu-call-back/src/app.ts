@@ -2,9 +2,13 @@ import * as dotenv from 'dotenv';
 // load env from .env file
 // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 dotenv.config();
+
+console.log(process.env);
+
+
 import {
     SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET,
-    CALL_OPENVIDU_CERTTYPE, USE_SSL
+    CALL_OPENVIDU_CERTTYPE, SERVER_TYPE
 } from './config';
 import * as express from 'express';
 import { app as callController } from './controllers/CallController';
@@ -33,12 +37,13 @@ const listeningHandler = () => {
     console.log(`OPENVIDU URL: ${OPENVIDU_URL}`);
     console.log(`OPENVIDU SECRET: ${OPENVIDU_SECRET}`);
     console.log(`CALL OPENVIDU CERTTYPE: ${CALL_OPENVIDU_CERTTYPE}`);
-    console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT} using ${USE_SSL ? "HTTPS" : "HTTP"}`);
+    console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
+    console.log(`OpenVidu Call Server type is ${SERVER_TYPE.toLocaleLowerCase() === "https" ? "HTTPS" : "HTTP"}`);
     console.log(" ")
     console.log("---------------------------------------------------------");
 };
 
-const server = USE_SSL
+const server = SERVER_TYPE.toLocaleLowerCase() === "https"
     ? https.createServer({
         key: fs.readFileSync(__dirname + '/certs/private.key'),
         cert: fs.readFileSync(__dirname + '/certs/full_chain.pem'),
