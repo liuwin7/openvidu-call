@@ -42,6 +42,12 @@ SERVER_PORT=40002
 # 如果配置为http，将使用HTTP。
 SERVER_TYPE=https
 
+# HTTPS Server 证书文件路径，默认采用代码中文件，<项目目录/openvidu-call-back/src/certs/full_chain.pem>
+# SERVER_SSL_CERT=
+
+# HTTPS Server 证书私钥文件路径，默认采用代码中文件，<项目目录/openvidu-call-back/src/certs/private.key>
+# SERVER_SSL_CERT_KEY=
+
 # Openvidu服务器的URL
 OPENVIDU_URL=http://120.48.83.53:5443
 
