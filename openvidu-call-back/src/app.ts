@@ -5,7 +5,7 @@ dotenv.config();
 
 import {
     SERVER_PORT, OPENVIDU_URL, OPENVIDU_SECRET,
-    CALL_OPENVIDU_CERTTYPE, SERVER_TYPE
+    CALL_OPENVIDU_CERTTYPE, SERVER_TYPE, SERVER_SSL_CERT, SERVER_SSL_CERT_KEY
 } from './config';
 import * as express from 'express';
 import { app as callController } from './controllers/CallController';
@@ -37,14 +37,18 @@ const listeningHandler = () => {
     console.log(`CALL OPENVIDU CERTTYPE: ${CALL_OPENVIDU_CERTTYPE}`);
     console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
     console.log(`OpenVidu Call Server type is ${SERVER_TYPE.toLocaleLowerCase() === "https" ? "HTTPS" : "HTTP"}`);
+    if (SERVER_TYPE.toLocaleLowerCase() === "https") {
+        console.log(`-- SSL certificate path is ${SERVER_SSL_CERT}`);
+        console.log(`-- SSL certificate key path is ${SERVER_SSL_CERT_KEY}`);
+    }
     console.log(" ")
     console.log("---------------------------------------------------------");
 };
 
 const server = SERVER_TYPE.toLocaleLowerCase() === "https"
     ? https.createServer({
-        key: fs.readFileSync(__dirname + '/certs/private.key'),
-        cert: fs.readFileSync(__dirname + '/certs/full_chain.pem'),
+        cert: fs.readFileSync(SERVER_SSL_CERT),
+        key: fs.readFileSync(SERVER_SSL_CERT_KEY),
     }, app)
     : http.createServer(app);
 

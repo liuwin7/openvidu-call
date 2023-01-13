@@ -1,5 +1,7 @@
 export const SERVER_PORT = process.env.SERVER_PORT || 40002;
 export const SERVER_TYPE = process.env.SERVER_TYPE || "https";
+export const SERVER_SSL_CERT = process.env.SERVER_SSL_CERT || (__dirname + '/certs/full_chain.pem');
+export const SERVER_SSL_CERT_KEY = process.env.SERVER_SSL_CERT_KEY || (__dirname + '/certs/private.key');
 // TODO: - 由于公司网络不允许内网的请求，所以，使用内网的HTTPS连接，并忽略HTTPS的验证
 
 // export const OPENVIDU_URL = process.env.OPENVIDU_URL || 'http://localhost:5443';
