@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as _ from 'lodash';
-import { wsDB } from '../app';
+import { logger, wsDB } from '../app';
 
 // util function
 const findWSById = (userId: string) => {
@@ -16,13 +16,13 @@ const router = express.Router();
 router.ws('/', (ws, req, next) => {
     ws.onmessage = event => {
         const msg = event.data.toString();
-        console.log("<Client Message> " + msg);
+        logger.info("<Client Message> " + msg);
         
         var data: any;
         try {
             data = JSON.parse(msg);
         } catch (error) {
-            console.error("<WS Error> 错误的JSON数据格式 " + msg);
+            logger.error("<WS Error> 错误的JSON数据格式 " + msg);
             return;
         }
         if (data.type === 'invite') { // 呼出
@@ -90,7 +90,7 @@ router.ws('/', (ws, req, next) => {
         const clientUserId = _.findKey(wsDB, { 'ws': ws });
         if (clientUserId) {
             _.unset(wsDB, clientUserId);
-            console.log(clientUserId + ' offline.');
+            logger.info(clientUserId + ' offline.');
         }
     };
     ws.onclose = event => {
@@ -101,7 +101,7 @@ router.ws('/', (ws, req, next) => {
         const clientUserId = _.findKey(wsDB, { 'ws': ws });
         if (clientUserId) {
             _.unset(wsDB, clientUserId);
-            console.log(clientUserId + ' offline.');
+            logger.info(clientUserId + ' offline.');
         }
     };
     next();

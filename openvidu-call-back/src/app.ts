@@ -18,6 +18,11 @@ import * as ExpressWs from 'express-ws';
 import { WebSocket } from 'ws';
 import * as morgan from "morgan";
 
+import * as log4js from "log4js";
+
+export const logger = log4js.getLogger();
+logger.level = "debug";
+
 // call database in memory
 export const wsDB: {
     [key: string]: {
@@ -30,19 +35,19 @@ export const wsDB: {
 const app = express();
 
 const listeningHandler = () => {
-    console.log("---------------------------------------------------------");
-    console.log(" ")
-    console.log(`OPENVIDU URL: ${OPENVIDU_URL}`);
-    console.log(`OPENVIDU SECRET: ${OPENVIDU_SECRET}`);
-    console.log(`CALL OPENVIDU CERTTYPE: ${CALL_OPENVIDU_CERTTYPE}`);
-    console.log(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
-    console.log(`OpenVidu Call Server type is ${SERVER_TYPE.toLocaleLowerCase() === "https" ? "HTTPS" : "HTTP"}`);
+    logger.info("---------------------------------------------------------");
+    logger.info(" ")
+    logger.info(`OPENVIDU URL: ${OPENVIDU_URL}`);
+    logger.info(`OPENVIDU SECRET: ${OPENVIDU_SECRET}`);
+    logger.info(`CALL OPENVIDU CERTTYPE: ${CALL_OPENVIDU_CERTTYPE}`);
+    logger.info(`OpenVidu Call Server is listening on port ${SERVER_PORT}`);
+    logger.info(`OpenVidu Call Server type is ${SERVER_TYPE.toLocaleLowerCase() === "https" ? "HTTPS" : "HTTP"}`);
     if (SERVER_TYPE.toLocaleLowerCase() === "https") {
-        console.log(`-- SSL certificate path is ${SERVER_SSL_CERT}`);
-        console.log(`-- SSL certificate key path is ${SERVER_SSL_CERT_KEY}`);
+        logger.info(`-- SSL certificate path is ${SERVER_SSL_CERT}`);
+        logger.info(`-- SSL certificate key path is ${SERVER_SSL_CERT_KEY}`);
     }
-    console.log(" ")
-    console.log("---------------------------------------------------------");
+    logger.info(" ")
+    logger.info("---------------------------------------------------------");
 };
 
 const server = SERVER_TYPE.toLocaleLowerCase() === "https"

@@ -1,3 +1,4 @@
+import { logger } from '../app';
 import { HttpClientService } from './HttpClientService';
 
 export class OpenViduService {
@@ -10,7 +11,7 @@ export class OpenViduService {
 
 	public async createSession(sessionId: string, openviduUrl: string, openviduSecret: string ): Promise<any> {
         const url = openviduUrl + '/openvidu/api/sessions';
-        console.log("Requesting session to ", url);
+        logger.info("Requesting session to ", url);
         const body: string = JSON.stringify({ customSessionId: sessionId});
 
         return await this.httpClientService.post(body, url, openviduSecret);
@@ -18,7 +19,7 @@ export class OpenViduService {
 
 	public async createToken(sessionId: string, openviduUrl: string, openviduSecret: string ): Promise<any> {
 		const url = openviduUrl + '/openvidu/api/sessions/' + sessionId + '/connection';
-        console.log("Requesting token to ", url);
+        logger.info("Requesting token to ", url);
         const body: string = JSON.stringify({});
 
         return await this.httpClientService.post(body, url, openviduSecret);
