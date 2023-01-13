@@ -2,6 +2,7 @@ import * as express from 'express';
 import {Request, Response} from 'express';
 import {OpenViduService} from '../services/OpenViduService';
 import {OPENVIDU_URL, OPENVIDU_SECRET} from '../config';
+import { logger } from '../app';
 
 export const app = express.Router({
     strict: true
@@ -11,7 +12,7 @@ const openviduService = new OpenViduService();
 
 app.post('/', async (req: Request, res: Response) => {
     let sessionId: string = req.body.sessionId;
-    console.log('Session ID received', req.body);
+    logger.debug('Session ID received', req.body);
     try {
         const sessionResponse = await openviduService.createSession(sessionId, OPENVIDU_URL, OPENVIDU_SECRET);
         sessionId = sessionResponse.id;
@@ -32,9 +33,9 @@ app.post('/', async (req: Request, res: Response) => {
 
 function handleError(error: any, res: Response) {
     const statusCode = error.response?.status;
-    console.error(error.toJSON());
+    logger.error(error.toJSON());
     if (error.code === 'ECONNREFUSED') {
-        console.error('ERROR: Cannot connect with OpenVidu Server');
+        logger.error('ERROR: Cannot connect with OpenVidu Server');
         res.status(503).send('ECONNREFUSED: Cannot connect with OpenVidu Server');
         return;
     }
