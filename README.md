@@ -22,7 +22,7 @@ npm install
 ```
 
 4. 使用pm2启动项目  
-```
+```bash
 pm2 start npm --name openvidu-call-back -- run start
 ```
 
@@ -30,7 +30,7 @@ pm2 start npm --name openvidu-call-back -- run start
 
 1. 配置文件位置`<项目目录>/openvidu-call-back/.env`
 2. 配置信息
-```
+```bash
 
 # 配置项目使用的端口号
 SERVER_PORT=40002
@@ -60,6 +60,6 @@ OPENVIDU_SECRET=openvidu
 ```
 
 3. 修改完配置文件以后，需要手动重启一下服务并加载环境变量。 
-```
+```bash
 pm2 restart openvidu-call-back --update-env
 ```
