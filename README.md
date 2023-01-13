@@ -53,7 +53,7 @@ OPENVIDU_SECRET=openvidu
 
 ```
 
-3. 修改完配置文件以后，需要手动重启一下服务。 
+3. 修改完配置文件以后，需要手动重启一下服务并加载环境变量。 
 ```
-pm2 restart openvidu-call-back
+pm2 restart openvidu-call-back --update-env
 ```
